@@ -21,6 +21,8 @@ for i in range(I.shape[0]):
         if I[i,j] == 69:
             end = i,j
             I[end] = ord("z")
+        if I[i,j] == 83:
+            start = i,j
 print(end)
 
 def get_neighbours_of(i,j):
@@ -43,15 +45,16 @@ import heapq as hq
 
 inf = 100_000
 
+
+
 D = np.full_like(I,  inf)
-
 H = []
-
-hq.heappush(H, (0, (1,1)))
-
+hq.heappush(H, (0, start))
 while H:
     value, coords = hq.heappop(H)
     if D[coords] == inf:  # not yet visited
+        # if D[coords] < value:
+        #     print(1)
         D[coords] = value
         if coords == end:
             print("DONE")
@@ -59,17 +62,41 @@ while H:
         for neighbour in get_neighbours_of(*coords):
             if D[neighbour] > (D[coords] + 1):  # replace current path if shorter path exists
                 hq.heappush(H, (D[coords] + 1, neighbour))
-            # print(H)
-
-print(D)
 
 D2 = np.where(D==inf, -1, D)
-
 print(np.max(D2))
 
-import matplotlib.pyplot as plt
+# part 2
 
-plt.imshow(D2)
+D = np.full_like(I,  inf)
+H = []
+all_starts = np.argwhere(I == ord("a"))
+print(all_starts)
+
+for start in all_starts:
+    hq.heappush(H, (0, tuple(start)))
+
+while H:
+    value, coords = hq.heappop(H)
+    if D[coords] == inf:  # not yet visited
+        # if D[coords] < value:
+        #     print(1)
+        D[coords] = value
+        if coords == end:
+            print("DONE")
+            break
+        for neighbour in get_neighbours_of(*coords):
+            if D[neighbour] > (D[coords] + 1):  # replace current path if shorter path exists
+                hq.heappush(H, (D[coords] + 1, neighbour))
+
+D2 = np.where(D==inf, -1, D)
+print(np.max(D2))
+
+
+
+
+# import matplotlib.pyplot as plt
+# plt.imshow(D2)
 
 # guesses 456 457 all too high
 
