@@ -1,3 +1,6 @@
 *checkpoint.ipynb
 *DS_Store
 .ipynb_checkpoints
+session.py
+
+__pycache__
