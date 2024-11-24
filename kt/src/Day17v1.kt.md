@@ -42,55 +42,51 @@ class Puzzle(
         return moves
     }
 
-    fun nextPath(path: Path, move: Move): Path {
-        val newMoves = path.moves.cycle(move)
-        val newPos = when (move) {
-            Move.UPPP -> path.pos.first-1 to path.pos.second
-            Move.DOWN -> path.pos.first+1 to path.pos.second
-            Move.RGHT -> path.pos.first to path.pos.second+1
-            Move.LEFT -> path.pos.first to path.pos.second-1
-        }
-        val newLoss = mapp[newPos.first][newPos.second]
-        return Path(newPos, newMoves, newLoss + path.loss)
+    private fun nextPaths(path: Path): List<Pair<Path, Int>> {
+        val possibleMoves = possibleMovesByInertia(path) intersect possibleMovesByLocation(path)
+        return possibleMoves
+            .map { move -> path.next(move) }
+            .map { move -> move to mapp[move.pos.first][move.pos.second] }
     }
 
-    fun nextPaths(path: Path): List<Path> {
-        val possibleMoves = possibleMovesByInertia(path) intersect possibleMovesByLocation(path)
-        return possibleMoves.map { move -> nextPath(path, move) }
-    }
+    fun nextNodes(node: Node): List<Node> = nextPaths(node.path).map { (p,l) -> Node(p, l+node.loss)  }
 }
 
+data class Node(
+    val path: Path,
+    val loss: Int,
+): Comparable<Node> {
+    override fun compareTo(other: Node): Int {
+        return this.loss.compareTo(other.loss)
+    }
+}
 
 
 data class Path(
     // first = y = outer array, second = x = inner array
     val pos: Pair<Int, Int> = 0 to 0,
     val moves: Triple<Move?, Move?, Move?> = Triple(null, null, null),
-    val loss: Int = 0
-): Comparable<Path> {
-    override fun compareTo(other: Path): Int {
-        return this.loss.compareTo(other.loss)
-    }
-    override fun equals(other: Any?): Boolean {
-        return (other is Path) && other.pos == this.pos && other.moves == this.moves
-    }
-
-    override fun hashCode(): Int {
-        var result = pos.hashCode()
-        result = 31 * result + moves.hashCode()
-        return result
+) {
+    fun next(move: Move): Path {
+        val newMoves = moves.cycle(move)
+        return when (move) {
+            Move.UPPP -> Path(this.pos.first-1 to this.pos.second, newMoves)
+            Move.DOWN -> Path(this.pos.first+1 to this.pos.second, newMoves)
+            Move.RGHT -> Path(this.pos.first to this.pos.second+1, newMoves)
+            Move.LEFT -> Path(this.pos.first to this.pos.second-1, newMoves)
+        }
     }
 }
 
-fun solveDijkstra(input: List<List<Int>>): Path? {
+fun solveDijkstra(input: List<List<Int>>): Node? {
     // initialise the puzzle to set up the Map
     val puzzle = Puzzle(input)
 
     // Dijkstra algorithm to find the shortest path between two nodes in a graph
-    val queue = PriorityQueue<Path>()
+    val queue = PriorityQueue<Node>()
 
     // add starting node to queue
-    queue.add(Path())
+    queue.add(Node(Path(), 0,))
 
     // define end goal to reach
     val endPos = puzzle.mapDimensions.first - 1 to puzzle.mapDimensions.second - 1
@@ -103,13 +99,13 @@ fun solveDijkstra(input: List<List<Int>>): Path? {
         val node = queue.remove() // get node with lowest loss
 
         // return if we are done
-        if (node.pos == endPos) return node
+        if (node.path.pos == endPos) return node
 
         // else get next nodes
-        puzzle.nextPaths(node).forEach { nextNode ->
+        puzzle.nextNodes(node).forEach { nextNode ->
             // if this new path is better than an existing path, we replace it
-            if (nextNode.loss < (visitedPaths[nextNode] ?: Int.MAX_VALUE)) {
-                visitedPaths[nextNode] = nextNode.loss
+            if (nextNode.loss < (visitedPaths[nextNode.path] ?: Int.MAX_VALUE)) {
+                visitedPaths[nextNode.path] = nextNode.loss
                 queue.add(nextNode)
             }
         }
