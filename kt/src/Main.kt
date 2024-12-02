@@ -14,7 +14,7 @@ fun main() {
 
     val a1 = File("i24/2").readLines()
         .map { line -> line.split(" ").map { it.toInt() } }
-        .map { line ->
+        .sumOf { line ->
             println(line)
             val lineVs: MutableList<List<Int>> = mutableListOf()
             repeat(line.size) { i ->
@@ -27,7 +27,7 @@ fun main() {
                 print(line2)
                 val a = line2.windowed(2).map { (v1, v2) ->
                     Pair(v1 - v2 in 1..3, v2 - v1 in 1..3)
-                }.unzip().toList().map { list -> list.all{it} }
+                }.unzip().toList().map { list -> list.all { it } }
                 println(a)
                 a
             }
@@ -35,7 +35,6 @@ fun main() {
             println(res)
             res
         }
-        .sum()
     println(a1)
 
 
