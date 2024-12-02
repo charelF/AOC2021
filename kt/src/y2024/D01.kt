@@ -4,9 +4,7 @@ import java.io.File
 import kotlin.math.abs
 
 fun d01() {
-    val filename = "i24/1"
-    val input = File(filename)
-    val (left, right) = input.readLines()
+    val (left, right) = File("i24/1").readLines()
         .map { it.split("   ") }
         .map { Pair(it[0].toInt(), it[1].toInt()) }
         .unzip()
