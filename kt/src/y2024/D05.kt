@@ -36,7 +36,7 @@ class D05 {
         val a1 = numberSequences.sumOf { seq ->
             // pair-wise comparison is enough to know they are in order. for (a,b,c), if a and b are in order and
             // b and c are in order, then a and c are also in order
-            val result = seq.zipWithNext { first, second -> comparator.compare(first, second) }
+            val result = seq.zipWithNext(comparator::compare)
             if ( result.all {it == -1} ) seq[seq.size/2] else 0  // for the correct ones, return the middle
         }
 
