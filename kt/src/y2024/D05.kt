@@ -44,39 +44,8 @@ class D05 {
             // when sorting, we can use the same comparator and let the sort function deal with the actual sorting,
             // we just give it the order
             val sorted = seq.sortedWith(comparator)
-            if (sorted != seq) sorted[result.size/2] else 0 // we just return the ones that were sorted
+            if (sorted != seq) sorted[sorted.size/2] else 0 // we just return the ones that were sorted
         }
         println(a1 to a2) // (5713, 5180)
     }
 }
-
-
-
-
-
-
-
-
-//val a1 = numberSequences.sumOf { seq ->
-//    val result = seq.zipWithNext { first, second ->
-//        when {
-//            pairs.contains(first to second) -> -1
-//            pairs.contains(second to first) -> 1
-//            else -> 0
-//        }
-//    }
-//    val correct = result.all {it == -1}
-//    if (correct) seq[seq.size/2] else 0
-//}
-//
-//val a2 = numberSequences.sumOf { seq ->
-//    val result = seq.sortedWith { first, second ->
-//        when {
-//            pairs.contains(first to second) -> -1
-//            pairs.contains(second to first) -> 1
-//            else -> 0
-//        }
-//    }
-//    if (result != seq) result[result.size/2] else 0
-//}
-//println(a1 to a2) // (5713, 5180)
