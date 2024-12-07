@@ -2,10 +2,7 @@ package y2024
 
 import java.io.File
 
-
-
 class D05 {
-
     fun main() {
         val (ruleSection, numSection) = File("i24/5").readText().split("\n\n")
         val rules = ruleSection.split("\n")
@@ -37,14 +34,14 @@ class D05 {
             // pair-wise comparison is enough to know they are in order. for (a,b,c), if a and b are in order and
             // b and c are in order, then a and c are also in order
             val result = seq.zipWithNext(comparator::compare)
-            if ( result.all {it == -1} ) seq[seq.size/2] else 0  // for the correct ones, return the middle
+            if (result.all { it == -1 }) seq[seq.size / 2] else 0  // for the correct ones, return the middle
         }
 
         val a2 = numberSequences.sumOf { seq ->
             // when sorting, we can use the same comparator and let the sort function deal with the actual sorting,
             // we just give it the order
             val sorted = seq.sortedWith(comparator)
-            if (sorted != seq) sorted[sorted.size/2] else 0 // we just return the ones that were sorted
+            if (sorted != seq) sorted[sorted.size / 2] else 0 // we just return the ones that were sorted
         }
         println(a1 to a2) // (5713, 5180)
     }
