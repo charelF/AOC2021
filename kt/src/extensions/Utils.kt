@@ -33,3 +33,5 @@ fun <E> List<E>.pairwise(withSelf: Boolean): Sequence<Pair<E,E>> = sequence {
     }
 }
 
+typealias Dual<E> = Pair<E, E>
+typealias DualDual<E> = Pair<Pair<E, E>, Pair<E, E>>
