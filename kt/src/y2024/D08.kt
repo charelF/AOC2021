@@ -28,9 +28,7 @@ class D08 {
         val antennas: MutableMap<Char, MutableList<Dual<Int>>> = mutableMapOf()
         lines.mapIndexed { i, line ->
             line.mapIndexed { j, c ->
-                if (c != '.') {
-                    antennas.computeIfAbsent(c) { mutableListOf() }.add(i to j)
-                }
+                if (c != '.') antennas.computeIfAbsent(c) { mutableListOf() }.add(i to j)
             }
         }
 
@@ -38,18 +36,18 @@ class D08 {
             coordinates
                 .pairwise(withSelf = false)
                 .map(::getP1AntiNodes)
-                .map(DualDual<Int>::toList).flatten()
+                .flatMap(DualDual<Int>::toList)
                 .filter { pair -> pair.isWithIn(m to n) }
-        }.toSet()
+        }.distinct().size
 
         val p2 = antennas.flatMap { (_, coordinates) ->
             coordinates
                 .pairwise(withSelf = false)
                 .map { pair -> getP2AntiNodes(pair, m to n) }
-                .map { seq -> seq.flatMap(DualDual<Int>::toList) }.flatten()
+                .flatMap { seq -> seq.flatMap(DualDual<Int>::toList) }
                 .filter { pair -> pair.isWithIn(m to n) }
-        }.toSet()
+        }.distinct().size
 
-        println(p1.size to p2.size)
+        println(p1 to p2)
     }
 }
