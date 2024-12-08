@@ -1,25 +1,28 @@
 package extensions
 
+typealias Dual<E> = Pair<E, E>
+typealias DualDual<E> = Pair<Pair<E, E>, Pair<E, E>>
+
 fun Boolean.toInt() = if (this) 1 else 0
 
-operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
+operator fun Dual<Int>.plus(other: Dual<Int>): Dual<Int> {
     return Pair(this.first + other.first, this.second + other.second)
 }
 
-operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
+operator fun Dual<Int>.minus(other: Dual<Int>): Dual<Int> {
     return Pair(this.first - other.first, this.second - other.second)
 }
 
-fun Pair<Int, Int>.isWithIn(bounds: Pair<Int, Int>): Boolean {
+fun Dual<Int>.isWithin(bounds: Dual<Int>): Boolean {
     return this.first >= 0 && this.first < bounds.first &&
             this.second >= 0 && this.second < bounds.second
 }
 
-operator fun <E> Iterable<Iterable<E>>.get(index: Pair<Int, Int>): E {
+operator fun <E> Iterable<Iterable<E>>.get(index: Dual<Int>): E {
     return this.elementAt(index.first).elementAt(index.second)
 }
 
-operator fun <E> MutableList<MutableList<E>>.set(index: Pair<Int, Int>, value: E) {
+operator fun <E> MutableList<MutableList<E>>.set(index: Dual<Int>, value: E) {
     this[index.first][index.second] = value
 }
 
@@ -32,6 +35,3 @@ fun <E> List<E>.pairwise(withSelf: Boolean): Sequence<Pair<E,E>> = sequence {
         }
     }
 }
-
-typealias Dual<E> = Pair<E, E>
-typealias DualDual<E> = Pair<Pair<E, E>, Pair<E, E>>

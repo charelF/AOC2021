@@ -13,7 +13,7 @@ class D08 {
     fun getP2AntiNodes(pair: DualDual<Int>, bounds: Dual<Int>): Sequence<DualDual<Int>> = sequence {
         val diff = pair.second - pair.first
         var (first, second) = pair
-        while (first.isWithIn(bounds) || second.isWithIn(bounds)) {
+        while (first.isWithin(bounds) || second.isWithin(bounds)) {
             yield(first to second)
             first -= diff
             second += diff
@@ -37,7 +37,7 @@ class D08 {
                 .pairwise(withSelf = false)
                 .map(::getP1AntiNodes)
                 .flatMap(DualDual<Int>::toList)
-                .filter { pair -> pair.isWithIn(m to n) }
+                .filter { pair -> pair.isWithin(m to n) }
         }.distinct().size
 
         val p2 = antennas.flatMap { (_, coordinates) ->
@@ -45,7 +45,7 @@ class D08 {
                 .pairwise(withSelf = false)
                 .map { pair -> getP2AntiNodes(pair, m to n) }
                 .flatMap { seq -> seq.flatMap(DualDual<Int>::toList) }
-                .filter { pair -> pair.isWithIn(m to n) }
+                .filter { pair -> pair.isWithin(m to n) }
         }.distinct().size
 
         println(p1 to p2)

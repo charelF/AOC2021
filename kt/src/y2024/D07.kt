@@ -110,3 +110,61 @@ class D07 {
         println(perm(listOf(1,2,3)))
     }
 }
+
+
+
+//fun <T> generateCombinations(
+//    elements: List<T>,
+//    length: Int,
+//    withRepetition: Boolean
+//): Sequence<List<T>> = sequence {
+//    if (length == 0) {
+//        yield(emptyList())
+//        return@sequence
+//    }
+//
+//    val indices = IntArray(length) { 0 }
+//    val n = elements.size
+//
+//    while (true) {
+//        // Yield the current combination
+//        yield(indices.map { elements[it] })
+//
+//        // Increment indices
+//        var carry = true
+//        for (i in length - 1 downTo 0) {
+//            if (withRepetition || indices[i] < n - 1) {
+//                indices[i]++
+//                if (!withRepetition) {
+//                    for (j in i + 1 until length) {
+//                        indices[j] = indices[i]
+//                    }
+//                }
+//                carry = false
+//                break
+//            } else {
+//                indices[i] = 0
+//            }
+//        }
+//        if (carry) break
+//    }
+//}
+//
+//
+//class D09 {
+//
+//    fun main() {
+//        val elements = listOf('a', 'b', 'c')
+//        val length = 3
+//
+//        println("With repetition:")
+//        generateCombinations(elements, length, withRepetition = true).forEach {
+//            println(it)
+//        }
+//
+//        println("\nWithout repetition:")
+//        generateCombinations(elements, length, withRepetition = false).forEach {
+//            println(it)
+//        }
+//    }
+//}
