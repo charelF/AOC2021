@@ -90,19 +90,23 @@ class D07 {
     }
 
 
-//    fun <E> perm(lst: List<E>): List<E> {
-//        val choices = lst
-//        fun x(rem: List<E>, perm: List<List<E>>) {
-//            if (rem.isEmpty()) {
-//                return perm
-//            }
-//            for (c in choices) {
-//                x(c)
-//            }
-//        }
-//    }
+    fun <E> perm(lst: List<E>): MutableList<List<E>> {
+        val choices = lst
+        val accu: MutableList<List<E>> = mutableListOf()
+        fun x(amount: Int, sofar: List<E>): List<E> {
+            if (amount == 0) {
+                return sofar
+            }
+            choices.forEach { choice ->
+                accu.add(x(amount-1, sofar + choice))
+                return sofar + choice
+            }
+            return sofar
+        }
+        return accu
+    }
 
-//    fun main() {
-//        println(perm(listOf(1,2,3)))
-//    }
+    fun main() {
+        println(perm(listOf(1,2,3)))
+    }
 }
