@@ -35,3 +35,19 @@ fun <E> List<E>.pairwise(withSelf: Boolean): Sequence<Pair<E,E>> = sequence {
         }
     }
 }
+
+fun <T> MutableList<T>.swap(i1: Int, i2: Int){
+    val tmp = this[i1]
+    this[i1] = this[i2]
+    this[i2] = tmp
+}
+
+fun <T> MutableList<T>.swap(i1: IntRange, i2: IntRange) {
+    for (i in i1) {
+        for (j in i2) {
+            val tmp = this[i]
+            this[i] = this[j]
+            this[j] = tmp
+        }
+    }
+}
