@@ -51,3 +51,40 @@ fun <T> MutableList<T>.swap(i1: IntRange, i2: IntRange) {
         }
     }
 }
+
+enum class ChooseBy {
+    REPETITION, UNIQUE, SET
+}
+fun <E> List<E>.combinations(
+    by: ChooseBy,
+    subSet: Int? = null,
+): Sequence<List<E>> = sequence {
+    // Algorithm from https://stackoverflow.com/a/17996834/9439097
+    val n = subSet ?: this@combinations.size
+    suspend fun SequenceScope<List<E>>.combinationsRecursive(soFar: List<E>, rest: List<E>, n: Int) {
+        if (n == 0) {
+            yield(soFar) // Base case: yield the current combination
+        } else {
+            for (i in rest.indices) {
+                val nextRest = when(by) {
+                    ChooseBy.SET -> rest.slice(i + 1 until rest.size)
+                    ChooseBy.UNIQUE -> rest.filterIndexed { index, _ -> index != i }
+                    ChooseBy.REPETITION -> rest
+                }
+                combinationsRecursive(soFar + rest[i], nextRest, n - 1) // Recursive call
+            }
+        }
+    }
+    combinationsRecursive(emptyList(), this@combinations, n)
+}
+// some quite weird things below with the scope. the actual function (if not wrapped) looks like this
+//fun combination(withRepetition: Boolean, soFar: List<Int>, rest: List<Int>, n: Int): Sequence<List<Int>> = sequence {
+//    if (n == 0) {
+//        yield(soFar)
+//    } else {
+//        for (i in rest.indices) {
+//            val nextRest = if (withRepetition) rest else rest.filterIndexed { index, _ -> index != i }
+//            yieldAll(combination(withRepetition, soFar + rest[i], nextRest, n - 1))
+//        }
+//    }
+//}
