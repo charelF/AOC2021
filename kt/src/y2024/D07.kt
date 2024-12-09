@@ -4,7 +4,6 @@ import extensions.*
 import java.io.File
 import java.util.function.BinaryOperator
 
-
 class D07 {
     enum class Op: BinaryOperator<Long> {
         PLUS { override fun apply(t: Long, u: Long): Long = t + u },
