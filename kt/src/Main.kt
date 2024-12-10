@@ -5,5 +5,5 @@ import extensions.*
 
 
 fun main() {
-    D07().main()
+    D10().main()
 }
