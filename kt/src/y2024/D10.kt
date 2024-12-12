@@ -26,7 +26,7 @@ class D10 {
             cells[0]!!.add(trailhead)
             for (i in 0 until 9) {
                 val neighbours = cells[i]!!.flatMap { cell ->
-                    cell.getNeighbours(CellDistanceMetric.MANHATTAN).asSequence()
+                    cell.getNeighbours(DistanceMetric.MANHATTAN).asSequence()
                         .filter { nb -> nb.isWithin(m to n) }
                         .filter { nb -> topMap[nb] == i + 1 }
                 }

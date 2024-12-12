@@ -18,11 +18,11 @@ fun Dual<Int>.isWithin(bounds: Dual<Int>): Boolean {
             this.second >= 0 && this.second < bounds.second
 }
 
-enum class CellDistanceMetric {
+enum class DistanceMetric {
     CHEBYSHEV, MANHATTAN
 }
 
-fun Dual<Int>.getNeighbours(metric: CellDistanceMetric, distance: Int = 1): Set<Dual<Int>> {
+fun Dual<Int>.getNeighbours(metric: DistanceMetric, distance: Int = 1): Set<Dual<Int>> {
     // TODO: optimise this code maybe? into a sequence?
     val cells = mutableSetOf(this)
     repeat(distance) {
@@ -31,7 +31,7 @@ fun Dual<Int>.getNeighbours(metric: CellDistanceMetric, distance: Int = 1): Set<
             cells.add(cell.first+1 to cell.second)
             cells.add(cell.first to cell.second-1)
             cells.add(cell.first to cell.second+1)
-            if (metric == CellDistanceMetric.CHEBYSHEV) {
+            if (metric == DistanceMetric.CHEBYSHEV) {
                 cells.add(cell.first-1 to cell.second-1)
                 cells.add(cell.first+1 to cell.second+1)
                 cells.add(cell.first+1 to cell.second-1)
