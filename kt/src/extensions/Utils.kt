@@ -13,6 +13,15 @@ operator fun Dual<Int>.minus(other: Dual<Int>): Dual<Int> {
     return Pair(this.first - other.first, this.second - other.second)
 }
 
+operator fun Dual<Int>.times(other: Dual<Int>): Dual<Int> {
+    return Pair(this.first * other.first, this.second * other.second)
+}
+
+operator fun Dual<Int>.times(number: Int): Dual<Int> {
+    return Pair(this.first * number, this.second * number)
+}
+
+
 fun Dual<Int>.isWithin(bounds: Dual<Int>): Boolean {
     return this.first >= 0 && this.first < bounds.first &&
             this.second >= 0 && this.second < bounds.second
