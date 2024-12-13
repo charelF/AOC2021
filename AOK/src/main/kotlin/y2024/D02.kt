@@ -5,7 +5,7 @@ import java.io.File
 
 class D02 {
     fun main() {
-        val input = File("i24/2").readLines()
+        val input = File("../i24/2").readLines()
             .map { line -> line.split(" ").map { it.toInt() } }
 
         val a1 = input.sumOf { line ->

@@ -1,5 +1,7 @@
 package extensions
 
+import kotlin.math.abs
+
 typealias Dual<E> = Pair<E, E>
 typealias DualDual<E> = Pair<Pair<E, E>, Pair<E, E>>
 
@@ -20,7 +22,6 @@ operator fun Dual<Int>.times(other: Dual<Int>): Dual<Int> {
 operator fun Dual<Int>.times(number: Int): Dual<Int> {
     return Pair(this.first * number, this.second * number)
 }
-
 
 fun Dual<Int>.isWithin(bounds: Dual<Int>): Boolean {
     return this.first >= 0 && this.first < bounds.first &&
@@ -111,6 +112,12 @@ fun <E> List<E>.combinations(
     }
     combinationsRecursive(emptyList(), this@combinations, n)
 }
+
+fun Double.isCloseTo(value: Long, epsilon: Double = 0.0001): Boolean {
+    return abs(this - value) < epsilon
+}
+
+
 // some quite weird things below with the scope. the actual function (if not wrapped) looks like this
 //fun combination(withRepetition: Boolean, soFar: List<Int>, rest: List<Int>, n: Int): Sequence<List<Int>> = sequence {
 //    if (n == 0) {
