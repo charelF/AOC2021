@@ -28,7 +28,8 @@ class D02 {
                 }.unzip().toList().map { list -> list.all { it } }
             }.max().toInt()
         }
-        println(a1)
-        println(a2)
+        println(a1 to a2)
     }
 }
+
+fun main() { D02().main() }

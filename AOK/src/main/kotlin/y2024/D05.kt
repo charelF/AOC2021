@@ -4,7 +4,7 @@ import java.io.File
 
 class D05 {
     fun main() {
-        val (ruleSection, numSection) = File("i24/5").readText().split("\n\n")
+        val (ruleSection, numSection) = File("../i24/5").readText().split("\n\n")
         val rules = ruleSection.split("\n")
         val numberSequences = numSection
             .split("\n")
@@ -46,3 +46,5 @@ class D05 {
         println(a1 to a2) // (5713, 5180)
     }
 }
+
+fun main() { D05().main() }

@@ -21,7 +21,7 @@ class D08 {
     }
 
     fun main() {
-        val lines = File("i24/8").readLines()
+        val lines = File("../i24/8").readLines()
         val m = lines.size
         val n = lines[0].count()
 
@@ -51,3 +51,5 @@ class D08 {
         println(p1 to p2)
     }
 }
+
+fun main() { D08().main() }

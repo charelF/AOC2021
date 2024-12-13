@@ -5,7 +5,7 @@ import extensions.*
 import kotlin.system.measureTimeMillis
 
 class D11 {
-    val stones = File("i24/11")
+    val stones = File("../i24/11")
         .readText().split(" ")
         .groupingBy { it }.eachCount() // group identical numbers by key = number, value = count
         .entries.associate { (k,v) -> k.toLong() to v.toLong() } // change both key and value to long
@@ -36,3 +36,5 @@ class D11 {
         // }
     }
 }
+
+fun main() = D11().main()

@@ -4,7 +4,7 @@ import java.io.File
 
 class D04 {
     fun main() {
-        val a = File("i24/4").readLines().map { line ->
+        val a = File("../i24/4").readLines().map { line ->
             line.toList()
         }
         var q1c = 0
@@ -37,3 +37,5 @@ class D04 {
         println(q1c to q2c)
     }
 }
+
+fun main() { D04().main() }

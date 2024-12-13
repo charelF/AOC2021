@@ -5,9 +5,7 @@ import java.io.File
 import org.apache.commons.math3.linear.*
 import kotlin.math.roundToLong
 
-fun main() {
-    D13().main()
-}
+fun main() = D13().main()
 
 class D13 {
     val machines: List<Machine>
@@ -42,7 +40,6 @@ class D13 {
             )
         }
     }
-
 
     fun simulate100Presses(machine: Machine): Int? {
         return (1 until 101).flatMap { i ->

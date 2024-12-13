@@ -7,7 +7,7 @@ class D03 {
     private val dontdoPattern = """don't\(\).*?(?:do\(\)|$)""".toRegex()  // .*? = as little as possible
 
     fun main() {
-        val text = File("i24/3")
+        val text = File("../i24/3")
             .readText().replace("\n", "-") // important for regex!
 
         fun find(input: String): Int {
@@ -16,7 +16,8 @@ class D03 {
                 x.toInt() * y.toInt()
             }
         }
-        println(find(text))
-        println(find(text.replace(dontdoPattern, "")))
+        println(find(text) to find(text.replace(dontdoPattern, "")))
     }
 }
+
+fun main() { D03().main() }

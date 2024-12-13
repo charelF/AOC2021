@@ -12,7 +12,7 @@ class D07 {
     }
 
     fun f(possibleOperations: List<Op>): Long {
-        return File("i24/7").readLines().sumOf { line ->
+        return File("../i24/7").readLines().sumOf { line ->
             val list = line.split(": ")
             val first = list[0].toLong()
             val nums = list[1].split(" ").map { it.toLong() }
@@ -32,3 +32,5 @@ class D07 {
         println(f(listOf(Op.PLUS, Op.MULT)) to f(Op.entries))
     }
 }
+
+fun main() { D07().main() }

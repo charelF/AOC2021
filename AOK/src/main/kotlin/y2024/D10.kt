@@ -4,7 +4,7 @@ import extensions.*
 import java.io.File
 
 class D10 {
-    private val topMap: List<List<Int>> = File("i24/10").readLines().map { line ->
+    private val topMap: List<List<Int>> = File("../i24/10").readLines().map { line ->
         line.map { cell ->
             when (cell) {
                 '.' -> -1
@@ -41,3 +41,5 @@ class D10 {
         println(f { mutableSetOf() } to f { mutableListOf() })
     }
 }
+
+fun main() = D10().main()

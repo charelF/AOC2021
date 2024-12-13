@@ -28,7 +28,7 @@ class D06 {
 
     init {
         var start: Dual<Int> = -1 to -1
-        guardMap = File("i24/6").readLines().mapIndexed { i, line ->
+        guardMap = File("../i24/6").readLines().mapIndexed { i, line ->
             line.mapIndexed { j, char ->
                 when(char) {
                     '#' -> Field.Obstructed
@@ -131,3 +131,5 @@ class D06 {
         }.let { println("fastF2 took $it ms")}
     }
 }
+
+fun main() { D06().main() }

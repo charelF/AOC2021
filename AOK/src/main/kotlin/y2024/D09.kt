@@ -49,7 +49,7 @@ class D09 {
     fun main() {
         val lst = mutableListOf<Int?>()
         measureTimeMillis {
-            File("i24/9").readText()
+            File("../i24/9").readText()
                 .map { it.toString().toInt() }
                 .forEachIndexed { i, num ->
                     repeat(num) { _ ->
@@ -64,3 +64,5 @@ class D09 {
 
     }
 }
+
+fun main() { D09().main() }

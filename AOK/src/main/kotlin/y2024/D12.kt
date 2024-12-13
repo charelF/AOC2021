@@ -4,7 +4,7 @@ import extensions.*
 import java.io.File
 
 class D12 {
-    val garden = File("i24/12").readLines().map { it.toList() }
+    val garden = File("../i24/12").readLines().map { it.toList() }
     val m = garden.size
     val n = garden[0].size
 
@@ -94,3 +94,5 @@ class D12 {
         }
     }
 }
+
+fun main() = D12().main()
