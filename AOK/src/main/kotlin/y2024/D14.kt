@@ -5,6 +5,11 @@ import java.io.File
 
 class D14 {
     val bounds = 103 to 101
+    val robots = File("../i24/14").readLines().map { line ->
+        val (px, py, vx, vy) = Regex("p=(-?\\d+),(-?\\d+) v=(-?\\d+),(-?\\d+)")
+            .findAll(line).toList().first().groupValues.drop(1).map { it.toInt() }
+        Robot(py to px, vy to vx)
+    }
 
     data class Robot(
         val pos: Dual<Int>,
@@ -27,34 +32,21 @@ class D14 {
         }
     }
 
+    fun printLevel(level: Array<BooleanArray>, printer: (String) -> Unit) {
+        level.forEach { row ->
+            row.forEach { cell ->
+                if (cell) print("░░") else print("  ")
+            }.also { print("\n") }
+        }
+    }
+
     fun draw(robots: List<Robot>, i: Int, save: Boolean) {
         val map = Array(bounds.first) { BooleanArray(bounds.second) { false } }
         robots.forEach { r -> map[r.pos.first][r.pos.second] = true }
         val file = File("ressources/y2024/d14/$i.txt")
         file.parentFile.mkdirs()
-        if (!save) {
-            map.forEach { row ->
-                row.forEach { cell ->
-                    if (cell) print("X") else print(" ")
-                }
-                println()
-            }
-        } else {
-            file.printWriter().use { out ->
-                map.forEach { row ->
-                    row.forEach { cell ->
-                        if (cell) out.print("X") else out.print(" ")
-                    }
-                    out.println()
-                }
-            }
-        }
-    }
-
-    val robots = File("../i24/14").readLines().map { line ->
-        val (px, py, vx, vy) = Regex("p=(-?\\d+),(-?\\d+) v=(-?\\d+),(-?\\d+)")
-            .findAll(line).toList().first().groupValues.drop(1).map { it.toInt() }
-        Robot(py to px, vy to vx)
+        if (!save) printLevel(map) { print(it) }
+        else file.printWriter().use { printLevel(map) { print(it) } }
     }
 
     fun main() {
@@ -65,7 +57,10 @@ class D14 {
             .reduce(Int::times)
             .also(::println)
 
-        for (i in 7383 until 7384) {
+        for (i in 0 until 10000) {
+            if (i != 7383) continue
+            print(i)
+            // to find the solution, i generated 10k files and checked manually
             draw(robots.map {it.move(i)}, i, save=false)
         }
     }
