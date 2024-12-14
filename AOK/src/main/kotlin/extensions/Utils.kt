@@ -23,6 +23,10 @@ operator fun Dual<Int>.times(number: Int): Dual<Int> {
     return Pair(this.first * number, this.second * number)
 }
 
+infix fun Dual<Int>.mod(other: Dual<Int>): Dual<Int> {
+    return Pair(this.first % other.first, this.second % other.second)
+}
+
 fun Dual<Int>.isWithin(bounds: Dual<Int>): Boolean {
     return this.first >= 0 && this.first < bounds.first &&
             this.second >= 0 && this.second < bounds.second

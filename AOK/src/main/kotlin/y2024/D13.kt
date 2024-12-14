@@ -4,6 +4,8 @@ import extensions.*
 import java.io.File
 import org.apache.commons.math3.linear.*
 import kotlin.math.roundToLong
+import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 fun main() = D13().main()
 
@@ -72,7 +74,7 @@ class D13 {
         val s1v1 = machines.mapNotNull(::simulate100Presses).sum()
         val s1 = machines.mapNotNull(::solveSystem).sum()
         val s2 = machines.map { machine ->
-            Machine (
+            Machine(
                 buttonA = machine.buttonA,
                 buttonB = machine.buttonB,
                 price = machine.price.first + 10000000000000 to machine.price.second + 10000000000000

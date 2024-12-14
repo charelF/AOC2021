@@ -10,7 +10,9 @@ class D11 {
         .groupingBy { it }.eachCount() // group identical numbers by key = number, value = count
         .entries.associate { (k,v) -> k.toLong() to v.toLong() } // change both key and value to long
 
-    fun main() { println(f(25).values.sum() to f(75).values.sum()) }
+    fun main() {
+        println(f(25).values.sum() to f(75).values.sum())
+    }
 
     fun blink(num: Long, amount: Long): Map<Long, Long> = when {
         num == 0L -> mapOf(1L to amount)
