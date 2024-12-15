@@ -116,12 +116,6 @@ fun <E> List<E>.combinations(
     }
     combinationsRecursive(emptyList(), this@combinations, n)
 }
-
-fun Double.isCloseTo(value: Long, epsilon: Double = 0.0001): Boolean {
-    return abs(this - value) < epsilon
-}
-
-
 // some quite weird things below with the scope. the actual function (if not wrapped) looks like this
 //fun combination(withRepetition: Boolean, soFar: List<Int>, rest: List<Int>, n: Int): Sequence<List<Int>> = sequence {
 //    if (n == 0) {
@@ -134,6 +128,11 @@ fun Double.isCloseTo(value: Long, epsilon: Double = 0.0001): Boolean {
 //    }
 //}
 
+fun <T> T.print() = println(this)
+
+fun Double.isCloseTo(value: Long, epsilon: Double = 0.0001): Boolean {
+    return abs(this - value) < epsilon
+}
 
 
 
