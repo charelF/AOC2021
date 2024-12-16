@@ -5,6 +5,10 @@ import extensions.*
 import java.util.PriorityQueue
 
 class D16 {
+    val puzzle = File("../i24/16").readLines().map { it.toList() }
+    val start = puzzle.size - 2 to 1
+    val end = 1 to puzzle.first().size -2
+
     enum class Direction {
         UP { override fun rot() = LE to RI },
         DO { override fun rot() = LE to RI },
@@ -51,32 +55,36 @@ class D16 {
         )
     }
 
-    fun main() {
-        val puzzle = File("../i24/16").readLines().map { it.toList() }.print()
-        val start = puzzle.size - 2 to 1
-        val end = 1 to puzzle.first().size -2
-        println(puzzle[start] to puzzle[end])
-
-        val queue = PriorityQueue<Edge>()
-        var edge = Edge(0, start, Direction.RI).print()
-        var nb: List<Edge> = listOf()
+    fun solve1(): Edge {
+        var edge = Edge(0, start, Direction.RI)
+        val queue = PriorityQueue<Edge>().also{it.add(edge)}
         val visited: MutableMap<Edge, Int> = mutableMapOf(edge to 0)
-        queue.add(edge)
+
         while (queue.isNotEmpty()) {
-            if (queue.size % 10000 == 0) {
-                println(queue.size)
-                println(queue.peek())
-            }
             edge = queue.poll()
             if (puzzle[edge.loc] == 'E') break
-            nb = edge.getNeighbours()
+            val neighbours = edge.getNeighbours()
                 .filter { puzzle[it.loc] != '#' }
                 .filter { e -> e.score < (visited[e] ?: Int.MAX_VALUE) }
-            queue.addAll(nb)
-            visited.putAll(nb.associateWith { it.score })
+            queue.addAll(neighbours)
+            visited.putAll(neighbours.associateWith { it.score })
         }
-        println(edge)
+        return edge
     }
+
+    fun main() {
+        val s1 = solve1().score
+        println(s1)
+    }
+
+//    fun solve2(best: Int) {
+//        var edge = Edge(0, start, Direction.RI)
+//        var path = listOf(edge)
+//        val queue = PriorityQueue<Edge>().also{it.add(edge)}
+//        val visited: MutableMap<Edge, Int> = mutableMapOf(edge to 0)
+//
+//
+//    }
 }
 
 fun main() = D16().main()
