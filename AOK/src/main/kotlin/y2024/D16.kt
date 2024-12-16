@@ -68,57 +68,45 @@ class D16 {
         return edge
     }
 
-    fun main() {
-        measureTimeMillis {
-            val s1 = solve1().score
-            println(s1)
-            val s2 = solve2(s1)
-            println("s2 $s2")
-        }.print()
-    }
-
-    data class Edge2(
-        val state: State,
-        val score: Int,
-        val hist: Set<Dual<Int>>
-    ): Comparable<Edge2> {
-        override fun compareTo(other: Edge2) = score.compareTo(other.score)
-    }
-
-    fun Edge2.getNeighbours(): List<Edge2> {
-        // moving = 1 point; rotating = 1k points; we can rotate or move
-        val dirs = state.dir.rot()
-        val move = state.move()
-        val newpath = hist + state.loc
-        return listOf(
-            Edge2(State(move, state.dir), score + 1, newpath),
-            Edge2(State(state.loc, dirs.first), score + 1000, newpath),
-            Edge2(State(state.loc, dirs.second), score + 1000, newpath),
-        )
-    }
-
     fun solve2(best: Int): Int {
-        var edge = Edge2(startState, 0, setOf())
-        val queue = PriorityQueue<Edge2>().also{it.add(edge)}
-        val visited: MutableMap<State, Int> = mutableMapOf(edge.state to edge.score)
+        var e2 = E2(Edge(startState, 0), setOf())
+        val queue = PriorityQueue<E2>().also{ it.add(e2) }
+        val visited: MutableMap<State, Int> = mutableMapOf(e2.edge.state to e2.edge.score)
         val bestTiles = mutableSetOf<Dual<Int>>()
 
         while (queue.isNotEmpty()) {
-            edge = queue.poll()
-            if (puzzle[edge.state.loc] == 'E') bestTiles.addAll(edge.hist)
-            val neighbours = edge.getNeighbours()
-                .filter { puzzle[it.state.loc] != '#' }  // don't run into walls
+            e2 = queue.poll()
+            if (puzzle[e2.edge.state.loc] == 'E') bestTiles.addAll(e2.hist)
+            val neighbours = e2.getNeighbours()
+                .filter { puzzle[it.edge.state.loc] != '#' }  // don't run into walls
                 // dont have to consider neighbours above the best score
-                .filter { it.score <= best }
+                .filter { it.edge.score <= best }
                 // we only add new edges when they arrive at the same state with an equal or lower score
-                .filter { it.score <= (visited[it.state] ?: Int.MAX_VALUE) }
-                // we dont need to check paths if all their nodes have already been visited
+                .filter { it.edge.score <= (visited[it.edge.state] ?: Int.MAX_VALUE) }
 
             queue.addAll(neighbours)
-            visited.putAll(neighbours.associate {it.state to it.score})
+            visited.putAll(neighbours.associate {it.edge.state to it.edge.score})
         }
         return bestTiles.size + 1
     }
+
+    fun main() {
+        measureTimeMillis {
+            val s1 = solve1().score
+            println("part 1: $s1")
+            val s2 = solve2(s1)
+            println("part 2: $s2")
+        }.print()
+    }
+
+    data class E2(
+        val edge: Edge,
+        val hist: Set<Dual<Int>>
+    ): Comparable<E2> {
+        override fun compareTo(other: E2) = edge.compareTo(other.edge)
+    }
+
+    fun E2.getNeighbours(): List<E2> = edge.getNeighbours().map { edge -> E2(edge, hist + edge.state.loc) }
 }
 
 fun main() = D16().main()
