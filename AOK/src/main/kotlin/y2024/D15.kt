@@ -5,7 +5,10 @@ import extensions.*
 import kotlin.io.readText
 import kotlin.text.split
 
-fun <T> T.print() = println(this)
+fun <T> T.print(): T {
+    println(this)
+    return this
+}
 
 enum class Cell15 { BOX, WALL, EMPTY }
 enum class Move15 { UP, DOWN, RIGHT, LEFT }
