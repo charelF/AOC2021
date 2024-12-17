@@ -1,6 +1,8 @@
 package extensions
 
 import kotlin.math.abs
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 typealias Dual<E> = Pair<E, E>
 typealias DualDual<E> = Pair<Pair<E, E>, Pair<E, E>>
@@ -132,6 +134,10 @@ fun <T> T.print() = println(this)
 
 fun Double.isCloseTo(value: Long, epsilon: Double = 0.0001): Boolean {
     return abs(this - value) < epsilon
+}
+
+infix fun Int.pow(x: Int): Int {
+    return this.toDouble().pow(x).roundToInt()
 }
 
 
