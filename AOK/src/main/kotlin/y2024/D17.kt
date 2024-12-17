@@ -14,9 +14,14 @@ class D17 {
     val combos = Regex("Program: ([\\d,]+)").find(text)!!.groupValues
         .last().split(",").map(String::toInt).windowed(2,2).print()
 
-    fun adv(v: Int) { regA = regA / (2 pow v) }
-    fun bdv(v: Int) { regB = regA / (2 pow v) }
-    fun cdv(v: Int) { regC = regA / (2 pow v) }
+    fun adv0(op: Int) { regA = regA / (2 pow op) }
+    fun bxl1(op: Int) { regB = regB xor op }
+    fun bst2(op: Int) { regB = op % 8 }
+    fun jnz3(op: Int) { if (regA != 0) instrPtr = op else instrPtr += 2 }
+    fun bxc4(op: Int) { regB = regB xor regC } // Operand is ignored
+    fun out5(op: Int) { output(op % 8) }
+    fun bdv6(op: Int) { regB = regA / (2 pow op) }
+    fun cdv7(op: Int) { regC = regA / (2 pow op) }
 
     fun main() {
         println(regA)
