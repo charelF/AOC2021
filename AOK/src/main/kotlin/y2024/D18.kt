@@ -11,7 +11,7 @@ class D18 {
         .flatMap{ it.split(",") }
         .chunked(2).map { it[0].toInt() to it[1].toInt() }
     val start = 0 to 0
-    val end = 70 to 70//6 to 6 //70 to 70 //6 to 6
+    val end = 70 to 70
 
     data class Edge(
         val state: Dual<Int>,
@@ -20,8 +20,8 @@ class D18 {
         override fun compareTo(other: D18.Edge): Int = score.compareTo(other.score)
     }
 
-    fun solve(firstBytes: List<Dual<Int>>): Edge {
-//        println(firstBytes)
+    fun solve(fallen: Int): Edge {
+        val fallenBytes = bytes.take(fallen)
         var edge = Edge(start, 0)
         val queue = PriorityQueue<Edge>().also{ it.add(edge) }
         val visited: MutableMap<Dual<Int>, Int> = mutableMapOf(edge.state to edge.score)
@@ -32,32 +32,30 @@ class D18 {
             val neighbours = edge
                 .state.getNeighbours(DistanceMetric.MANHATTAN)
                 .filter { it.isWithin(end + (1 to 1))}
-                .filter { !firstBytes.contains(it) }
+                .filter { !fallenBytes.contains(it) }
                 .map { Edge(it, edge.score + 1) }
                 .filter { it.score < (visited[it.state] ?: Int.MAX_VALUE) }
             queue.addAll(neighbours)
             visited.putAll(neighbours.associate {it.state to it.score})
         }
-//        println(visited)
         return edge
     }
 
     fun main() {
-        solve(bytes.take(1024)).print()
+        solve(1024).also { println("part 1: $it") }
 
-        println("size" to bytes.size)
-        for (i in 1024 until bytes.size) {
-            println(i)
-
-            val first = bytes.take(i)
-//            println("first bytes: ${first.size} last one is ${first.last()}")
-            val edge = solve(first)
-//            println(edge)
-            if (edge.state != end) {
-                println(first.last())
-                break
-            }
+        // binary search
+        var l = 1024
+        var r = bytes.lastIndex
+        var i = -1
+        while (true) {
+            i = (l + r) / 2
+            if (l == r) break
+            if (solve(i).state == end) l = i + 1
+            else r = i
         }
+        // not sure why i - 1
+        println("part 2: ${bytes[i - 1]} at pos ${i - 1}")
     }
 }
 
