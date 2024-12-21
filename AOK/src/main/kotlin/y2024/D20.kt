@@ -5,15 +5,8 @@ import java.io.File
 import java.util.PriorityQueue
 
 
-fun <E> Iterable<Iterable<E>>.dualIndexOf(predicate: (E) -> Boolean): Dual<Int> {
-    return this.mapIndexedNotNull { i, row ->
-        val j = row.indexOfFirst { predicate(it) }
-        if (j == -1) null else i to j
-    }.first()
-}
-
 class D20 {
-    val racetrack = File("../i24/20").readLines().map { it.toList() }
+    val racetrack = File("../i24/20s").readLines().map { it.toList() }
     val bounds = racetrack.size to racetrack.first().size
     val start = racetrack.dualIndexOf { it == 'S' }
     val end = racetrack.dualIndexOf { it == 'E' }
@@ -70,7 +63,7 @@ class D20 {
         println(shortest)
         println("total walls: ${walls.size}")
 
-        val improvement = 100
+        val improvement = 40
 
         walls.mapIndexed { i, wall ->
             println(i)

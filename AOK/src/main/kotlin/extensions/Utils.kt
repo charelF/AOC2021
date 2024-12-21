@@ -147,3 +147,9 @@ infix fun Long.pow(x: Long): Long {
 
 
 
+fun <E> Iterable<Iterable<E>>.dualIndexOf(predicate: (E) -> Boolean): Dual<Int> {
+    return this.mapIndexedNotNull { i, row ->
+        val j = row.indexOfFirst { predicate(it) }
+        if (j == -1) null else i to j
+    }.first()
+}
