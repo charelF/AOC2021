@@ -29,6 +29,8 @@ class D22 {
     fun main() {
         seeds.map { secretNumber(it, 2000).last() }.sum().print()
 
+        // idea: just compute all existing four-difference sequences (there are at most 20**4)
+        // and for each of them count the price it would result in --> then just take the max
         seeds
             .map { priceChangeMap(it, 2000) } // computes all possible prices
             .flatMap { it.entries } // now we do the classic: combining list of maps into a single map and sum the values

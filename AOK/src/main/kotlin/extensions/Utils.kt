@@ -44,6 +44,7 @@ fun Dual<Int>.getNeighbours(metric: DistanceMetric, distance: Int = 1): Set<Dual
     val cells = mutableSetOf(this)
     repeat(distance) {
         cells.forEach { cell ->
+            println(cell)
             cells.add(cell.first-1 to cell.second)
             cells.add(cell.first+1 to cell.second)
             cells.add(cell.first to cell.second-1)
