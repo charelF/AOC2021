@@ -14,6 +14,10 @@ operator fun Dual<Int>.plus(other: Dual<Int>): Dual<Int> {
     return Pair(this.first + other.first, this.second + other.second)
 }
 
+fun Dual<Int>.abs(): Dual<Int> {
+    return abs(this.first) to abs(this.second)
+}
+
 operator fun Dual<Int>.minus(other: Dual<Int>): Dual<Int> {
     return Pair(this.first - other.first, this.second - other.second)
 }
@@ -42,23 +46,37 @@ enum class DistanceMetric {
 fun Dual<Int>.getNeighbours(metric: DistanceMetric, distance: Int = 1): Set<Dual<Int>> {
     // TODO: optimise this code maybe? into a sequence?
     val cells = mutableSetOf(this)
+    if (distance == 0) return cells
+    val newCells = mutableSetOf<Dual<Int>>()
     repeat(distance) {
-        cells.forEach { cell ->
-            println(cell)
-            cells.add(cell.first-1 to cell.second)
-            cells.add(cell.first+1 to cell.second)
-            cells.add(cell.first to cell.second-1)
-            cells.add(cell.first to cell.second+1)
+        for (cell in cells) {
+            newCells.add(cell.first-1 to cell.second)
+            newCells.add(cell.first+1 to cell.second)
+            newCells.add(cell.first to cell.second-1)
+            newCells.add(cell.first to cell.second+1)
             if (metric == DistanceMetric.CHEBYSHEV) {
-                cells.add(cell.first-1 to cell.second-1)
-                cells.add(cell.first+1 to cell.second+1)
-                cells.add(cell.first+1 to cell.second-1)
-                cells.add(cell.first-1 to cell.second+1)
+                newCells.add(cell.first-1 to cell.second-1)
+                newCells.add(cell.first+1 to cell.second+1)
+                newCells.add(cell.first+1 to cell.second-1)
+                newCells.add(cell.first-1 to cell.second+1)
             }
         }
+        cells.addAll(newCells)
+        newCells.clear()
     }
     cells.remove(this)
     return cells
+}
+
+fun Dual<Int>.distanceFrom(other: Dual<Int>, metric: DistanceMetric): Int {
+    return when (metric) {
+        DistanceMetric.MANHATTAN -> (this - other).abs().sum()
+        DistanceMetric.CHEBYSHEV -> TODO()
+    }
+}
+
+fun Dual<Int>.sum(): Int {
+    return this.first + this.second
 }
 
 operator fun <E> Iterable<Iterable<E>>.get(index: Dual<Int>): E {
@@ -133,6 +151,17 @@ fun <E> List<E>.combinations(
 //}
 
 fun <T> T.print() = println(this)
+
+fun <T> List<List<T>>.print2D(pad: Int, map: Map<T, String> = mapOf()): List<List<T>> {
+    this.forEachIndexed { i, line ->
+        line.forEachIndexed { j, t ->
+            val v = map[t] ?: t.toString()
+            print(v.padStart(pad, ' '))
+        }
+        println()
+    }
+    return this
+}
 
 fun Double.isCloseTo(value: Long, epsilon: Double = 0.0001): Boolean {
     return abs(this - value) < epsilon
