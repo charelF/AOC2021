@@ -105,8 +105,10 @@ class D20c {
         var bestEdges = mutableSetOf<Edge>()
 
         while (queue.isNotEmpty()) {
+
             edge = queue.poll()
             if (edge.state.pos == end) {
+                println(queue.size)
                 println(edge)
 //                best++
                 bestEdges.add(edge)
@@ -173,7 +175,7 @@ class D20c {
 
 
 
-        dijkstraCheat(distances, 20, shortest-72)
+        dijkstraCheat(distances, 20, shortest-50)
         racetrack.mapIndexed { i, line ->
             line.mapIndexed { j, ch ->
                 distances[i to j] ?: '.'
