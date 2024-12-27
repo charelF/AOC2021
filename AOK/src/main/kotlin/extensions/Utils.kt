@@ -175,6 +175,10 @@ infix fun Long.pow(x: Long): Long {
     return this.toDouble().pow(x.toDouble()).roundToLong()
 }
 
+fun String.splitAt(i: Int): Pair<String, String> {
+    return this.take(i) to this.drop(i)
+}
+
 
 
 fun <E> Iterable<Iterable<E>>.dualIndexOf(predicate: (E) -> Boolean): Dual<Int> {

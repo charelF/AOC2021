@@ -184,27 +184,14 @@ class D20 {
 
     fun main() {
         val shortest = dijkstra().second.score
-        println("shortest (non cheating path): $shortest")
         val distances = bfs()
 
-//        measureTimeMillis{
-//            dijkstraCheat(cheatTime = 20, timeLimit = shortest-50).print().also { it.values.sum().print() }
-//        }.print()
+        // below is my idea - its correct but too slow
+        // dijkstraCheat(cheatTime = 20, timeLimit = shortest-50).print().also { it.values.sum().print() }
 
         println("part 1: ${compareCoordinates(distances, 2, 100)}")
         println("part 2: ${compareCoordinates(distances, 20, 100)}")
-
-        // printing
-//        racetrack.mapIndexed { i, line ->
-//            line.mapIndexed { j, ch ->
-//                distances[i to j] ?: '.'
-//            }
-//        }.print2D(pad=5)
     }
 }
 
 fun main() = D20().main()
-
-
-// 1240174 That's not the right answer; your answer is too high
-// 1010263
