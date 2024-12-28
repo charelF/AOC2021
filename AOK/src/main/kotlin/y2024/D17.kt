@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import java.io.File
 import kotlin.system.measureTimeMillis
 
+//550ms for 200k starting values of A
 //fun run(intialA: Long, program: List<Dual<Int>>): MutableList<Long> {
 //    var a = intialA
 //    var b = 0L
@@ -40,72 +41,149 @@ import kotlin.system.measureTimeMillis
 //    return output
 //}
 
+//150ms for 200k starting values of A (99% due to `pow2`)
+//fun run(intialA: Long, program: List<Dual<Int>>): MutableList<Long> {
+//    var a = intialA
+//    var b = 0L
+//    var c = 0L
+//    var opcode: Int
+//    var operand: Int
+//    var combo: Long
+//    var pointer = 0
+//    val output = mutableListOf<Long>()
+//    while (pointer < program.size) {
+//        val ops = program[pointer++]
+//        opcode = ops.first
+//        operand = ops.second
+//
+//        when {
+//            opcode == 0 && operand == 4 -> a /= pow2L(a.toInt())  // wont happen too high
+//            opcode == 0 && operand == 5 -> a /= pow2L(b.toInt())
+//            opcode == 0 && operand == 6 -> a /= pow2L(c.toInt())
+//            opcode == 0 -> a /= pow2L(operand)
+//
+//            opcode == 1 -> b = b xor operand.toLong()
+//
+//            opcode == 2 && operand == 4 -> b = (a % 8L)
+//            opcode == 2 && operand == 5 -> b = (b % 8L)
+//            opcode == 2 && operand == 6 -> b = (c % 8L)
+//            opcode == 2 -> b = (operand % 8L)
+//
+//
+//            opcode == 3 -> if (a != 0L) pointer = operand
+//
+//
+//            opcode == 4 -> b = b xor c
+//
+//
+//            opcode == 5 && operand == 4-> output.add(a % 8L)
+//            opcode == 5 && operand == 5-> output.add(b % 8L)
+//            opcode == 5 && operand == 6-> output.add(c % 8L)
+//            opcode == 5 -> output.add(operand % 8L)
+//
+//
+//            opcode == 6&& operand == 4 -> b = a / pow2L(a.toInt())
+//            opcode == 6 && operand == 5-> b = a / pow2L(b.toInt())
+//            opcode == 6 && operand == 6-> b = a / pow2L(c.toInt())
+//            opcode == 6 -> b = a / pow2L(operand)
+//
+//            opcode == 7 && operand == 4-> c = a / pow2L(a.toInt())
+//            opcode == 7&& operand == 5 -> c = a / pow2L(b.toInt())
+//            opcode == 7 && operand == 6-> c = a / pow2L(c.toInt())
+//            opcode == 7 -> c = a / pow2L(operand)
+//
+//            else -> throw IllegalArgumentException("unexpected")
+//        }
+//    }
+//    return output
+//}
 
-class D17 {
-    fun run(intialA: Long, program: List<Dual<Int>>): MutableList<Long> {
-        var a = intialA
-        var b = 0L
-        var c = 0L
-        var opcode: Int
-        var operand: Int
-        var combo: Long
-        var pointer = 0
-        val output = mutableListOf<Long>()
-        while (pointer < program.size) {
-            val ops = program[pointer++]
-            opcode = ops.first
-            operand = ops.second
+//fun run(intialA: Long, program: List<Dual<Int>>): MutableList<Long> {
+//    var a = intialA
+//    var b = 0L
+//    var c = 0L
+//    var opcode: Int
+//    var operand: Int
+//    var combo: Long
+//    var pointer = 0
+//    val output = mutableListOf<Long>()
+//    while (pointer < program.size) {
+//        val ops = program[pointer++]
+//        prev = current
+//        current = ops
+//
+//        if (prev == 1 to 5 && current != 7 to 5) {
+//            TODO()
+//        }
+//
+//        opcode = ops.first
+//        operand = ops.second
+//        when {
+//            opcode == 0 -> a /= 8
+//            opcode == 1 -> b = b xor operand.toLong() // (1, 5) (1, 6)
+//            opcode == 2 && operand == 4 -> b = (a % 8L)
+//            opcode == 3 -> if (a != 0L) pointer = 0
+//            opcode == 4 -> b = b xor c
+//            opcode == 5 && operand == 5-> output.add(b % 8L)
+//            opcode == 7 && operand == 5 -> c = a / pow2L(b.toInt())
+//            else -> throw IllegalArgumentException("unexpected")
+//        }
+//    }
+//    return output
+//}
 
-//            if (listOf(4,5,6).contains(operand) && listOf(0,6,7).contains(opcode)) {
-//                print(operand to opcode)
-//            }
-            combo = when {
-                operand == 4 -> a
-                operand == 5 -> b
-                operand == 6 -> c
-                else -> operand.toLong()
-            }
-            when {
-                opcode == 0 && operand == 4 -> a /= pow2L(combo.toInt())
-                opcode == 0 && operand == 5 -> a /= pow2L(combo.toInt())
-                opcode == 0 && operand == 6 -> a /= pow2L(combo.toInt())
-                opcode == 0 -> a /= pow2L(combo.toInt())
+val memory : MutableMap<Dual<Int>, Int> = mutableMapOf()
+//memory[ops] = memory.getOrDefault(ops, 0) + 1
 
-                opcode == 1 -> b = b xor operand.toLong()
+var prev: Dual<Int> = -1 to -1
+var current: Dual<Int> = -1 to -1
 
-                opcode == 2 && operand == 4 -> b = (combo % 8L)
-                opcode == 2 && operand == 5 -> b = (combo % 8L)
-                opcode == 2 && operand == 6 -> b = (combo % 8L)
-                opcode == 2 -> b = (combo % 8L)
+fun run(intialA: Long, program: List<Dual<Int>>): MutableList<Long> {
+    var a = intialA
+    var b = 0L
+    var c = 0L
+    var opcode: Int
+    var operand: Int
+    var combo: Long
+    var pointer = 0
+    val output = mutableListOf<Long>()
+    while (pointer < program.size) {
+        val ops = program[pointer++]
+        prev = current
+        current = ops
+
+//        (5, 5)
+//        (3, 0)
+//        (2, 4)
+//        (1, 5)
+//        (7, 5)
+
+        if (prev == 5 to 5 && current != 3 to 0) { TODO() }
+        if (prev != 5 to 5 && current == 3 to 0) { TODO() }
+        if (prev == 3 to 0 && current != 2 to 4) { TODO() }
+
+//        if (prev != 3 to 0 && current == 2 to 4) { TODO() }
+
+        if (prev != 2 to 4 && current == 1 to 5) { TODO() }
+        if (prev != 2 to 4 && current == 1 to 5) { TODO() }
+        if (prev != 1 to 5 && current == 7 to 5) { TODO() }
+        if (prev != 1 to 5 && current == 7 to 5) { TODO() }
 
 
-                opcode == 3 -> if (a != 0L) pointer = operand
-
-
-                opcode == 4 -> b = b xor c
-
-
-                opcode == 5 && operand == 4-> output.add(combo % 8L)
-                opcode == 5 && operand == 5-> output.add(combo % 8L)
-                opcode == 5 && operand == 6-> output.add(combo % 8L)
-                opcode == 5 -> output.add(combo % 8L)
-
-
-                opcode == 6&& operand == 4 -> b = a / pow2L(combo.toInt())
-                opcode == 6 && operand == 5-> b = a / pow2L(combo.toInt())
-                opcode == 6 && operand == 6-> b = a / pow2L(combo.toInt())
-                opcode == 6 -> b = a / pow2L(combo.toInt())
-
-                opcode == 7 && operand == 4-> c = a / pow2L(combo.toInt())
-                opcode == 7&& operand == 5 -> c = a / pow2L(combo.toInt())
-                opcode == 7 && operand == 6-> c = a / pow2L(combo.toInt())
-                opcode == 7 -> c = a / pow2L(combo.toInt())
-
-                else -> throw IllegalArgumentException("unexpected")
-            }
+        opcode = ops.first
+        operand = ops.second
+        when {
+            opcode == 0 -> a /= 8
+            opcode == 1 -> b = b xor operand.toLong() // (1, 5) (1, 6)
+            opcode == 2 && operand == 4 -> b = (a % 8L)
+            opcode == 3 -> if (a != 0L) pointer = 0
+            opcode == 4 -> b = b xor c
+            opcode == 5 && operand == 5-> output.add(b % 8L)
+            opcode == 7 && operand == 5 -> c = a / pow2L(b.toInt())
+            else -> throw IllegalArgumentException("unexpected")
         }
-        return output
     }
+    return output
 }
 
 
@@ -119,6 +197,14 @@ class D17 {
 //   however at the same, 63 is the highest value x st 2**63 still fits into a long,
 // so its very likely that situation never happens i.e. 2**a. b and c may be smaller idk but at least a is very big
 // using when(x) {4 -> ....} seems to take the same time as when() {x==4 -> ...} and allows for more creative patterns
+// i merged the two when statements into oen big one useing the above knowledge (i.e just doing the conditions via when() {cond1 -> , instead of in the when(cond)
+// then i commented out all the ones where the program still ran without them
+// seems these are the only combinations that exist: {(2, 4)=11542401, (1, 5)=11542401, (7, 5)=11542401, (1, 6)=11542401, (0, 3)=11542401, (4, 0)=11542401, (5, 5)=11542401, (3, 0)=11542401}
+// using that we can remove lots of cases and hardcoded the values in others (e.g. only opcode 3 case is (3, 0) so it means the pointer is always set to 0)
+// from printing it seems b and c are still big numbers sometimes
+// once i had the statement simplified, i started looking into sequences, e.g. (1,5) is always succeeded by (7,5), its never one or the other on its own
+// so we can combine those instructions
+// I found that there is one sequence: (5, 5) (3, 0) (2, 4) (1, 5) (7, 5) and except for (2,4) (which can happen without preceeding (3,0)) they all seem to happen only inside the sequence
 
 
 fun main() {
@@ -131,24 +217,33 @@ fun main() {
         .last().split(",").map(String::toInt).print()
     val program = flatProgram.chunked(2).map { it.first() to it.last() }
 
-    val d17 = D17()
-    d17.run(regA, program).print()
+    run(regA, program).print()
     measureTimeMillis {
         (100_100_100_000_000L until 100_100_100_200_000L).forEach {
-            d17.run(it.toLong(), program)
+            run(it.toLong(), program)
         }
-    }.print()
-    d17.run(100_100_100_000_000L, program).print()
+    }.also { println("took $it ms") }
+    measureTimeMillis {
+        (1 until 1234567).sumOf {
+            run(it.toLong(), program).first()
+        }.print()
+    }.also { println("took $it ms") }
+    run(100_100_100_000_000L, program).print()
     println("---")
 
     println("""
+--SOLUTION--
 24847151
 [2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 0, 5, 5, 3, 0]
 [7, 3, 1, 3, 6, 3, 6, 0, 2]
-557
+took 141 ms
+4243641
+took 240 ms
 [3, 2, 5, 5, 0, 4, 1, 1, 6, 5, 0, 3, 6, 3, 7, 1]
     """
     )
+
+    println(memory)
 }
 
 
