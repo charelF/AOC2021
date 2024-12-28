@@ -179,6 +179,12 @@ fun String.splitAt(i: Int): Pair<String, String> {
     return this.take(i) to this.drop(i)
 }
 
+/**
+ * computing 2^exp more efficiently via bitshifting
+ */
+fun pow2L(exp: Int): Long = 1L shl exp
+
+fun pow2(exp: Int): Int = 1 shl exp
 
 
 fun <E> Iterable<Iterable<E>>.dualIndexOf(predicate: (E) -> Boolean): Dual<Int> {
