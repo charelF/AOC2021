@@ -1,9 +1,66 @@
 package y2024
 
 import extensions.*
-import kotlinx.coroutines.*
 import java.io.File
 import kotlin.system.measureTimeMillis
+
+fun run(startA: Long, out: IntArray) {
+    var a = startA
+    var i = 0
+    while (a != 0L) {
+        out[i++] = ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+        a = a shr 3
+    }
+}
+
+fun main() {
+    val text = File("../i24/17").readText()
+    val findReg = { ch: Char -> Regex("Register $ch: (\\d+)").find(text)!!.groupValues.last().toLong() }
+    val regA = findReg('A')
+    val flatProgram = Regex("Program: ([\\d,]+)").find(text)!!.groupValues
+        .last().split(",").map(String::toInt)
+    val arrayProgram = flatProgram.toIntArray()
+
+    val arrayOut = IntArray(size = flatProgram.size) { 0 }
+    run(regA, arrayOut)
+    println("part 1: ${arrayOut.toList()}")
+
+    // reset the array for part 2
+    arrayOut.fill(0)
+    println(arrayProgram.toList())
+    println(arrayOut.toList())
+
+    val start = pow2L(42)
+    val end = pow2L(48) - 1
+    val bitHalf = pow2L(24) // bit-wise this is the half between 0 and 2**48
+    var states: Int = 0 // just for statistics at the end
+    measureTimeMillis {
+        var a: Long
+        var i: Int
+        outer@for (last8 in start until end step bitHalf) {
+            states++
+            run(last8, arrayOut)
+            // if the last 8 match, we now try the other half to find a match for the first 8
+            if (arrayOut.takeLast(8) == arrayProgram.takeLast(8)) {
+                for (first8 in 0 until bitHalf) {
+                    states++
+                    run(first8+last8, arrayOut)
+                    // we know the last 8 match and now also the first 8 match!
+                    if (arrayOut.take(8) == arrayProgram.take(8)) {
+                        println("first8: ${first8.toString(2).padStart(47, '0')}")
+                        println("last8:  ${last8.toString(2)}")
+                        println("part 2: ${first8+last8}")
+                        break@outer
+                    }
+                    arrayOut.fill(0)
+                }
+            }
+            arrayOut.fill(0)
+        }
+    }.also { println("searched through $states states in $it ms") }
+}
+
+// the road was hard:
 
 //550ms for 200k starting values of A
 //fun run(intialA: Long, program: List<Dual<Int>>): MutableList<Long> {
@@ -447,198 +504,4 @@ import kotlin.system.measureTimeMillis
 //        }
 //        arrayOut.fill(0)
 //    }
-//}
-
-
-fun main() {
-    // So, the program 0,1,2,3 would run the instruction whose opcode is 0 and pass it the operand 1,
-    // then run the instruction having opcode 2 and pass it the operand 3, then halt.
-    val text = File("../i24/17").readText()
-    val findReg = { ch: Char -> Regex("Register $ch: (\\d+)").find(text)!!.groupValues.last().toLong() }
-    val regA = findReg('A')
-    val flatProgram = Regex("Program: ([\\d,]+)").find(text)!!.groupValues
-        .last().split(",").map(String::toInt)
-    val program = flatProgram.chunked(2).map { it.first() to it.last() }
-
-    val arrayProgram = flatProgram.toIntArray()
-    val arrayOut = IntArray(size = flatProgram.size) { 0 }
-    println(arrayProgram.toList())
-    println(arrayOut.toList())
-
-    val start = pow2L(42)
-    val end = pow2L(48) - 1
-    val stepsize = pow2L(24)
-    measureTimeMillis {
-        var a = 0L
-        var i = 0
-        for (v1 in start until end step stepsize) {
-            i = 0
-            a = v1
-            while (a != 0L) {
-                arrayOut[i++] =
-                    ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
-                a = a shr 3
-            }
-            if (arrayOut.takeLast(8) == arrayProgram.takeLast(8)) {
-                println("${v1.toString(2)} ${arrayOut.toList()}")
-
-                for (v2 in 0 until stepsize) {
-                    i = 0
-                    a = v1 + v2
-                    while (a != 0L) {
-                        arrayOut[i++] =
-                            ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
-                        a = a shr 3
-                    }
-                    if (arrayOut.take(8) == arrayProgram.take(8)) {
-                        println("${v1.toString(2)} ${arrayOut.toList()}")
-                        println("found!")
-                        println(v1 + v2)
-                        return
-                    }
-                    arrayOut.fill(0)
-                }
-            }
-            arrayOut.fill(0)
-        }
-    }
-}
-
-
-
-
-
-
-//    arrayOut = IntArray(size = flatProgram.size) { 0 }
-//    println(startBinary.chunked(8))
-
-//    for (ia in 0b111111000-1 until 0b111111111+2) {
-//
-//
-////        if (arrayOut.take(3).all { it == 3 } && arrayOut.slice(3 until 6) == arrayProgram.slice(3 until 6)) {
-//
-//        println(Integer.toBinaryString(ia.toInt()))
-////            break
-//
-//    }
-
-//    run(3287378L + 777L, arrayOut)  // doesnt work out
-//    println(arrayOut.toList())
-
-
-//    (777, [2, 4, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 2, 0])
-//    (3287378, [3, 3, 3, 5, 7, 5, 1, 2, 3, 3, 3, 3, 1, 3, 2, 0])
-
-
-
-//    (pow2L(41)).print()
-
-//    run(regA, arrayOut)
-    // [42, 45) is the range
-//    run(pow2L(42), arrayOut)
-
-
-//    for (ia in 0..8*8*8 step 8) {
-//
-//
-//
-//        println("ia $ia ${ia shr 3} ${ia shr 6}")
-//    }
-
-
-
-
-
-
-//    measureTimeMillis {
-//        (100_000_000 until 100_200_000).forEach {
-//            run(it.toLong(), arrayOut)
-//        }
-//    }.also { println("200k took $it ms") }
-
-
-//    measureTimeMillis {
-//        (1 until 1234567).sumOf {
-//            run(it.toLong())[0]
-//        }.print()
-//    }.also { println("took $it ms") }
-//    run(100_100_100_000_000L).print()
-//    println("---")
-//
-//    println(
-//        """
-//--SOLUTION--
-//24847151
-//[2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 0, 5, 5, 3, 0]
-//[7, 3, 1, 3, 6, 3, 6, 0, 2]
-//took 141 ms
-w//4243641
-//took 240 ms
-//[3, 2, 5, 5, 0, 4, 1, 1, 6, 5, 0, 3, 6, 3, 7, 1]
-//    """
-//    )
-//}
-
-
-
-//    println("input: $flatProgram")
-//    run(regA, program).also { println("output: $it")  }
-
-
-//    println(memory)
-
-
-
-//    val totalSize = Long.MAX_VALUE / 100000
-//    val batchSize = 1
-//    val stepSize = totalSize / 100
-//    println(flatProgram)
-//    measureTimeMillis {
-//        runBlocking {
-//            val jobs = (0L until totalSize step stepSize).map { i ->
-//                launch(Dispatchers.Default) {
-//                    repeat(batchSize) { j ->
-//                        val out = D17(i + j, 0, 0, program).main()
-//                        println("$out i $i | j $j ")
-//                        if (out == flatProgram) {
-//                            println("FOUND: $i")
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }.print()
-
-
-//fun tests() {
-//    var d17 = D17()
-//    d17.run(Triple(0, 0, 9), listOf(2 to 6))
-//    println(d17.regA == 0)
-//    println(d17.regB == 1)
-//    println(d17.regC == 9)
-//    println(d17.output.isEmpty())
-//
-//    d17 = D17()
-//    d17.run(Triple(10,0,0), listOf(5 to 0, 5 to 1, 5 to 4))
-//    println(d17.regA == 10)
-//    println(d17.regB == 0)
-//    println(d17.regC == 0)
-//    println(d17.output == listOf(0,1,2))
-//
-//    d17 = D17()
-//    d17.run(Triple(2024,0,0), listOf(0 to 1, 5 to 4, 3 to 0))
-//    println(d17.regA == 0)
-//    println(d17.regB == 0)
-//    println(d17.regC == 0)
-//    println(d17.output == listOf(4,2,5,6,7,7,7,7,3,1,0))
-//
-//    d17 = D17()
-//    d17.run(Triple(0,29,0), listOf(1 to 7))
-//    println(d17.regB == 26)
-//    println(d17.output.isEmpty())
-//
-//    d17 = D17()
-//    d17.run(Triple(0,2024,43690), listOf(4 to 0))
-//    println(d17.regB == 44354)
-//    println(d17.output.isEmpty())
 //}
