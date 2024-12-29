@@ -150,7 +150,10 @@ fun <E> List<E>.combinations(
 //    }
 //}
 
-fun <T> T.print() = println(this)
+fun <T> T.print(): T {
+    println(this)
+    return this
+}
 
 fun <T> List<List<T>>.print2D(pad: Int, map: Map<T, String> = mapOf()): List<List<T>> {
     this.forEachIndexed { i, line ->
@@ -159,6 +162,13 @@ fun <T> List<List<T>>.print2D(pad: Int, map: Map<T, String> = mapOf()): List<Lis
             print(v.padStart(pad, ' '))
         }
         println()
+    }
+    return this
+}
+
+fun <T: Iterable<Any>> T.printVert(): T {
+    for (v in this) {
+        println(v)
     }
     return this
 }

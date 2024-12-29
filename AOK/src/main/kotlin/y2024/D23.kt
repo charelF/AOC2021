@@ -1,6 +1,7 @@
 package y2024
 
 import java.io.File
+import extensions.*
 import kotlin.system.measureTimeMillis
 
 class D23 {

@@ -1,6 +1,7 @@
 package y2024
 
 import java.io.File
+import extensions.*
 
 class D22 {
     val seeds = File("../i24/22").readLines().map(String::toLong)
