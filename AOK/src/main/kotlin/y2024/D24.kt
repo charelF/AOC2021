@@ -4,55 +4,47 @@ import java.io.File
 import extensions.*
 
 class D24 {
-//    data class Node<T> (
-//        val node: T,
-//        val children: Dual<Node<T>>
-//    )
+
+    data class Gate (
+        val lhs: String,
+        val rhs: String,
+        val op: (Boolean, Boolean) -> Boolean,
+        val res: String,
+    )
 
     init {
-        val (p1, p2) = File("../i24/24s").readText().split("\n\n")
-        val known = p1.lines().associate { it.split(": ")
-            .let { (wire, value) -> wire to (value == "1") }
-        }.toMutableMap()
-        val gates = p2.lines().associate { it.split(" ")
-            .let { (w1, op, w2, _, w3) -> setOf(w1, w2) to (op to w3) }
-        }
-        val unknown = (gates.flatMap { (k,v) -> listOf(k.first(), k.last(), v.second) }.toMutableSet() - known.keys).toMutableSet()
+        val (p1, p2) = File("../i24/24").readText().split("\n\n")
+        val known = p1.lines().associate {
+            it.split(": ")
+                .let { (wire, value) -> wire to (value == "1") }
+        }.toMutableMap().print()
 
-        while (unknown.isNotEmpty()) {
-            println(unknown.size)
-            gates.filter { (k,v) -> known.keys.containsAll(k) && unknown.contains(v.second) }.forEach { (k,v) ->
-                when(v.first) {
-                    "AND" -> known[v.second] = known[k.first()]!! && known[k.last()]!!
-                    "XOR" -> known[v.second] = known[k.first()]!! xor known[k.last()]!!
-                    "OR" -> known[v.second] = known[k.first()]!! || known[k.last()]!!
+        val gates = p2.lines().map {
+            it.split(" ").let { (w1, op, w2, _, w3) ->
+                when (op) {
+                    "XOR" -> Gate(w1, w2, Boolean::xor, w3)
+                    "AND" -> Gate(w1, w2, Boolean::and, w3)
+                    "OR" -> Gate(w1, w2, Boolean::or, w3)
+                    else -> TODO()
                 }
-                unknown -= known.keys
             }
-            unknown -= known.keys
-            println(unknown)
+        }.print()
+
+        repeat(100) {
+            println(known.size)
+            for (gate in gates) {
+                if (gate.lhs in known && gate.rhs in known) {
+                    known[gate.res] = gate.op(known[gate.lhs]!!, known[gate.rhs]!!)
+                }
+            }
         }
-        println(known)
 
-
-
-
-
-
+        known.filterKeys { it.startsWith('z') }
+            .toSortedMap().reversed().values.map { it.toInt() }
+            .joinToString("")
+            .toLong(2)
+            .print()
     }
-//    val split = inp5.split("\n\n")
-//    val register =
-//        split.first().split("\n").associate {
-//    val wires = split.last().split("\n").associate {
-//        it.split(" ").let { (w1, op, w2, _, w3) ->
-//            when(op) {
-//                "AND" -> Triple(w1,w2,w3) to BinOp.AND
-//                "XOR" -> Triple(w1,w2,w3) to BinOp.XOR
-//                "OR" -> Triple(w1,w2,w3) to BinOp.OR
-//                else -> TODO()
-//            }
-//        }
-//    }.toMutableMap()
 }
 
 fun main() {
