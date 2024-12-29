@@ -405,6 +405,51 @@ import kotlin.system.measureTimeMillis
 //    }
 //}
 
+// i was able to brute force it by first finding which number to look for to match the last 8 values of the program
+// those are very big numbers, but also with a very big stepsize so the seach space is reasonable (multiple million only)
+// then once i find one, i search for all values up to the stepsize to find which numbers affect the first 8 values of the program
+// this search space is also reasonable, multiple million only.
+// final algorithm:
+
+//val start = pow2L(42)
+//val end = pow2L(48) - 1
+//val stepsize = pow2L(24)
+//measureTimeMillis {
+//    var a = 0L
+//    var i = 0
+//    for (v1 in start until end step stepsize) {
+//        i = 0
+//        a = v1
+//        while (a != 0L) {
+//            arrayOut[i++] =
+//                ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+//            a = a shr 3
+//        }
+//        if (arrayOut.takeLast(8) == arrayProgram.takeLast(8)) {
+//            println("${v1.toString(2)} ${arrayOut.toList()}")
+//
+//            for (v2 in 0 until stepsize) {
+//                i = 0
+//                a = v1 + v2
+//                while (a != 0L) {
+//                    arrayOut[i++] =
+//                        ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+//                    a = a shr 3
+//                }
+//                if (arrayOut.take(8) == arrayProgram.take(8)) {
+//                    println("${v1.toString(2)} ${arrayOut.toList()}")
+//                    println("found!")
+//                    println(v1 + v2)
+//                    return
+//                }
+//                arrayOut.fill(0)
+//            }
+//        }
+//        arrayOut.fill(0)
+//    }
+//}
+
+
 fun main() {
     // So, the program 0,1,2,3 would run the instruction whose opcode is 0 and pass it the operand 1,
     // then run the instruction having opcode 2 and pass it the operand 3, then halt.
@@ -422,7 +467,6 @@ fun main() {
 
     val start = pow2L(42)
     val end = pow2L(48) - 1
-    var x = 1
     val stepsize = pow2L(24)
     measureTimeMillis {
         var a = 0L
@@ -448,7 +492,7 @@ fun main() {
                     }
                     if (arrayOut.take(8) == arrayProgram.take(8)) {
                         println("${v1.toString(2)} ${arrayOut.toList()}")
-                        println("yes")
+                        println("found!")
                         println(v1 + v2)
                         return
                     }
@@ -528,7 +572,7 @@ fun main() {
 //[2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 0, 5, 5, 3, 0]
 //[7, 3, 1, 3, 6, 3, 6, 0, 2]
 //took 141 ms
-//4243641
+w//4243641
 //took 240 ms
 //[3, 2, 5, 5, 0, 4, 1, 1, 6, 5, 0, 3, 6, 3, 7, 1]
 //    """
