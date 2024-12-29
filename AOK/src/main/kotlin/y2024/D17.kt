@@ -220,7 +220,7 @@ import kotlin.system.measureTimeMillis
 // and this way we can remove the whole pointer logic
 // if (a != 0L) pointer = 6 else break
 
-//fun run(intialA: Long, program: List<Dual<Int>>): List<Int> {
+//fun run(intialA: Long): List<Int> {
 //    var a = intialA
 //    var b = 0
 //    var c = 0L
@@ -235,10 +235,7 @@ import kotlin.system.measureTimeMillis
 //    }
 //    return output
 //}
-
-// now i combine run and main to try and find out which kind of a produces and output program that starts
-// the same as my input program
-
+//
 //fun main() {
 //    // So, the program 0,1,2,3 would run the instruction whose opcode is 0 and pass it the operand 1,
 //    // then run the instruction having opcode 2 and pass it the operand 3, then halt.
@@ -250,22 +247,23 @@ import kotlin.system.measureTimeMillis
 //    val program = flatProgram.chunked(2).map { it.first() to it.last() }
 //
 //    println("input: $flatProgram")
-//    y2024.run(regA, program).also { println("output: $it")  }
+//    run(regA, program).also { println("output: $it") }
 //
 //    measureTimeMillis {
 //        (100_100_100_000_000L until 100_100_100_200_000L).forEach {
-//            y2024.run(it.toLong(), program)
+//            run(it.toLong(), program)
 //        }
 //    }.also { println("took $it ms") }
 //    measureTimeMillis {
 //        (1 until 1234567).sumOf {
-//            y2024.run(it.toLong(), program).first()
+//            run(it.toLong(), program).first()
 //        }.print()
 //    }.also { println("took $it ms") }
-//    y2024.run(100_100_100_000_000L, program).print()
+//    run(100_100_100_000_000L, program).print()
 //    println("---")
 //
-//    println("""
+//    println(
+//        """
 //--SOLUTION--
 //24847151
 //[2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 0, 5, 5, 3, 0]
@@ -276,58 +274,266 @@ import kotlin.system.measureTimeMillis
 //[3, 2, 5, 5, 0, 4, 1, 1, 6, 5, 0, 3, 6, 3, 7, 1]
 //    """
 //    )
+//}
 
-// by combining everything, i am now checking which initial A values produce an output
-// that starts the same way as the input:
+// found something: dividing a number by a power of 2 --> in binary its equivalent to just shifting right
+// so a / pow2L(b) becomes a shr b
+// another find (via chatgtp): we can modify (a % 8) to (a & 7)
+// makes sense since 8 = 1000, mod8 = taking 1[000], 7 = 111, and e.g. 5 = 101, 5and 7 = 101 & 111 = 101
+// also division by 8 = right shift by 3
+// (re)using a mutable array instead of generating a list took the runtime down from 30ms to 10ms
 
-//input: [2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 0, 5, 5, 3, 0]
-//a 3287450 output [2, 4, 1, 5, 7, 5, 1, 2]
-//a 3385754 output [2, 4, 1, 5, 7, 5, 1, 2]
-//a 3705242 output [2, 4, 1, 5, 7, 5, 4, 2]
-//a 3706625 output [2, 4, 1, 5, 7, 5, 4, 2]
-//a 3706633 output [2, 4, 1, 5, 7, 5, 4, 2]
+//val arrayProgram = flatProgram.toIntArray()
+//val arrayOut = IntArray(size = flatProgram.size) { 0 }
+//fun run(startA: Long, out: IntArray) {
+//    var a = startA
+//    var b = 0
+//    var c = 0L
+//    var i = 0
+//    while (a != 0L) {
+//        b = (a and 7L).toInt() xor 5
+//        c = a shr b
+//        a = a shr 3
+//        out[i++] = ((b xor 6) % 8) xor (c%8L).toInt()
+//    }
+//}
 
-// now i try to find patterns in it
+// can even remove c and could remove b
+//fun run(startA: Long, out: IntArray) {
+//    var a = startA
+//    var b = 0
+//    var i = 0
+//    while (a != 0L) {
+//        b = (a and 7L).toInt() xor 5
+//        out[i++] = ((b xor 6) % 8) xor ((a shr b) % 8L).toInt()
+//        a = a shr 3
+//    }
+//}
+// we shift a right by 3 each round
+// so that means to produce an output of length 8
+// we need an input a of 3*16 = 48 bits or something like that
+// now im seeing patterns run(pow2L(47), arrayOut) -> [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 5]
+// pow2L(45) is the first value of A where input length is 16, pow2L(45)-1 is not the case anymore
+// similarly, pow2L(48) -1 is the last one that works, pow2L(48) overflows (makes sense to due unsafe i++)
+// unfortunately, there are still 246290604621824 values between those two bounds ...
+// we can move the pattern around: run(pow2L(48)-pow2L(20), arrayOut) == [3, 3, 3, 3, 3, 4, 1, 3, 3, 3, 3, 3, 3, 3, 3, 5]
+// also my input has a trailing 0 so we can go down a bit
+// we can simplify more: b is not needed
+// this makes it visible that each outputed number only depends on 3 bits of a, they dont depend on each other
+// a is not overwritten, just consumed from
+// the output is deduced from a alone
+// there are patterns
+// (200, [5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(208, [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(216, [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(224, [4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(232, [4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(240, [4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(248, [4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(256, [3, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//(264, [3, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+//for (ia in 0..8*8*8 step 8) {
+//    arrayOut = IntArray(size = flatProgram.size) { 0 }
+//    run(ia.toLong(), arrayOut)
+//    println(ia to arrayOut.toList())
+////        println("ia $ia ${ia shr 3} ${ia shr 6}")
+//}
 
+//fun run(startA: Long, out: IntArray) {
+//    var a = startA
+//    var i = 0
+//    while (a != 0L) {
+//        out[i++] = ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+//        a = a shr 3
+//    }
+//}
 
+// still looking for patterns - at least its fast - 1second for 100M entries
 
+//measureTimeMillis {
+//    var a = 0L
+//    var i = 0
+//    for (v in 0 until 100_000_000L) {
+//        i = 0
+//        a = start + v
+//        while (a != 0L) {
+//            arrayOut[i++] =
+//                ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+//            a = a shr 3
+//        }
+////        println(arrayOut.toList())
+////        break
+//        if (arrayOut.take(7) == arrayProgram.take(7)) {
+//            println(v)
+//            println(v.toString(2))
+//            println(v.toString(8))
+//            println("---")
+//        }
+//        arrayOut.fill(0)
+//    }
+//}.print()
 
+// i fiured out that we the last 8 digits can be exactly foudn like this:
+//val start = pow2L(42)
+//val end = pow2L(48) - 1
+//var x = 1
+//measureTimeMillis {
+//    var a = 0L
+//    var i = 0
+//    for (v1 in start until end step pow2L(25)) {
+// and the first 8 found can be similarly found but from the increasign from the front!
 
-
+//val start = pow2L(42)
+//val end = pow2L(48) - 1
+//var x = 1
+//measureTimeMillis {
+//    var a = 0L
+//    var i = 0
+//    for (v1 in start until end step pow2L(25)) {
+//        i = 0
+//        a = v1
+//        while (a != 0L) {
+//            arrayOut[i++] =
+//                ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+//            a = a shr 3
+//        }
+//        if (arrayOut.takeLast(8) == arrayProgram.takeLast(8)) {
+//            println("${v1.toString(2)} ${arrayOut.toList()}")
+//            break
+//        }
+//        arrayOut.fill(0)
+//    }
+//}
 
 fun main() {
     // So, the program 0,1,2,3 would run the instruction whose opcode is 0 and pass it the operand 1,
     // then run the instruction having opcode 2 and pass it the operand 3, then halt.
     val text = File("../i24/17").readText()
     val findReg = { ch: Char -> Regex("Register $ch: (\\d+)").find(text)!!.groupValues.last().toLong() }
-    val regA = findReg('A').print()
-
+    val regA = findReg('A')
     val flatProgram = Regex("Program: ([\\d,]+)").find(text)!!.groupValues
-        .last().split(",").map(String::toInt).print()
-
+        .last().split(",").map(String::toInt)
     val program = flatProgram.chunked(2).map { it.first() to it.last() }
 
+    val arrayProgram = flatProgram.toIntArray()
+    val arrayOut = IntArray(size = flatProgram.size) { 0 }
+    println(arrayProgram.toList())
+    println(arrayOut.toList())
 
-    println("input:  $flatProgram")
+    val start = pow2L(42)
+    val end = pow2L(48) - 1
+    var x = 1
+    val stepsize = pow2L(24)
+    measureTimeMillis {
+        var a = 0L
+        var i = 0
+        for (v1 in start until end step stepsize) {
+            i = 0
+            a = v1
+            while (a != 0L) {
+                arrayOut[i++] =
+                    ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+                a = a shr 3
+            }
+            if (arrayOut.takeLast(8) == arrayProgram.takeLast(8)) {
+                println("${v1.toString(2)} ${arrayOut.toList()}")
 
-    for (initA in 1 until 500_000_00L) {
-        var a = initA
-        var b = 0
-        var c = 0L
-        var out: Int
-        val output = mutableListOf<Int>()
-        while (a != 0L) {
-            b = (a % 8L).toInt() xor 5
-            c = a / pow2L(b)
-            a = a / 8
-            out = ((b xor 6) % 8) xor (c % 8L).toInt()
-            output.add(out)
-        }
-        if (output.take(7) == flatProgram.take(7)) {
-            println("output: $output via a $initA ")
+                for (v2 in 0 until stepsize) {
+                    i = 0
+                    a = v1 + v2
+                    while (a != 0L) {
+                        arrayOut[i++] =
+                            ((((a and 7L).toInt() xor 5) xor 6) % 8) xor ((a shr ((a and 7L).toInt() xor 5)) % 8L).toInt()
+                        a = a shr 3
+                    }
+                    if (arrayOut.take(8) == arrayProgram.take(8)) {
+                        println("${v1.toString(2)} ${arrayOut.toList()}")
+                        println("yes")
+                        println(v1 + v2)
+                        return
+                    }
+                    arrayOut.fill(0)
+                }
+            }
+            arrayOut.fill(0)
         }
     }
 }
+
+
+
+
+
+
+//    arrayOut = IntArray(size = flatProgram.size) { 0 }
+//    println(startBinary.chunked(8))
+
+//    for (ia in 0b111111000-1 until 0b111111111+2) {
+//
+//
+////        if (arrayOut.take(3).all { it == 3 } && arrayOut.slice(3 until 6) == arrayProgram.slice(3 until 6)) {
+//
+//        println(Integer.toBinaryString(ia.toInt()))
+////            break
+//
+//    }
+
+//    run(3287378L + 777L, arrayOut)  // doesnt work out
+//    println(arrayOut.toList())
+
+
+//    (777, [2, 4, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 2, 0])
+//    (3287378, [3, 3, 3, 5, 7, 5, 1, 2, 3, 3, 3, 3, 1, 3, 2, 0])
+
+
+
+//    (pow2L(41)).print()
+
+//    run(regA, arrayOut)
+    // [42, 45) is the range
+//    run(pow2L(42), arrayOut)
+
+
+//    for (ia in 0..8*8*8 step 8) {
+//
+//
+//
+//        println("ia $ia ${ia shr 3} ${ia shr 6}")
+//    }
+
+
+
+
+
+
+//    measureTimeMillis {
+//        (100_000_000 until 100_200_000).forEach {
+//            run(it.toLong(), arrayOut)
+//        }
+//    }.also { println("200k took $it ms") }
+
+
+//    measureTimeMillis {
+//        (1 until 1234567).sumOf {
+//            run(it.toLong())[0]
+//        }.print()
+//    }.also { println("took $it ms") }
+//    run(100_100_100_000_000L).print()
+//    println("---")
+//
+//    println(
+//        """
+//--SOLUTION--
+//24847151
+//[2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 0, 5, 5, 3, 0]
+//[7, 3, 1, 3, 6, 3, 6, 0, 2]
+//took 141 ms
+//4243641
+//took 240 ms
+//[3, 2, 5, 5, 0, 4, 1, 1, 6, 5, 0, 3, 6, 3, 7, 1]
+//    """
+//    )
+//}
 
 
 
